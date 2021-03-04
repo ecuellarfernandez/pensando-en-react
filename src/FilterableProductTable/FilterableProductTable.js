@@ -29,7 +29,7 @@ function ProductTable( { products, filterText, isStockOnly } ){
     let lastCategory = null;
     
     products.forEach((product)=>{
-        if(product.name.indexOf(filterText) === -1){
+        if(product.name.toLowerCase().indexOf(filterText.toLowerCase()) === -1){
             return;
         }
         if(isStockOnly && !product.stocked){
@@ -54,18 +54,29 @@ function ProductTable( { products, filterText, isStockOnly } ){
 
 }
 
-function SearchBar({ filterText, isStockOnly }){
+function SearchBar({ filterText, isStockOnly, onFilterTextChange, onInStockChange }){
+
+    function handleFilterTextChange(e){
+        onFilterTextChange(e.target.value)
+    }
+
+    function handleInStockChange(e){
+        onInStockChange(e.target.checked)
+    }
+
     return(
         <form>
             <input 
                 type="text"
                 placeholder="Search..."
                 value={filterText}
+                onChange={handleFilterTextChange}
             />
             <label>
                 <input
                     type="checkbox"
                     checked={isStockOnly}
+                    onChange={handleInStockChange}
                 /> Only show products in stock
             </label>
         </form>
@@ -77,11 +88,21 @@ export default function FilterableProductTable(){
     const [text, setText] = useState('');
     const [isStock, setIsStock] = useState(false);
 
+    function handleFilterTextChange(inputText){
+        setText( inputText )
+    }
+
+    function handleInStockChange(inputStock){
+        setIsStock( inputStock )
+    }
+
     return(
         <div>
             <SearchBar 
                 filterText={text}
                 isStockOnly={isStock}
+                onFilterTextChange={handleFilterTextChange}
+                onInStockChange={handleInStockChange}
             />
             <ProductTable 
                 products={PRODUCTS}
